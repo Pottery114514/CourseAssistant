@@ -4,73 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能课程助手 - 人机交互原型演示</title>
+    <!-- 自定义加载动画,滚动条等 -->
+    <link rel="stylesheet" href="css/styles.css">
     <!-- 引入 Tailwind CSS 用于快速构建一致性 UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', 'Helvetica Neue', 'Arial', 'Microsoft YaHei', sans-serif;
-            background-color: #f8fafc;
-        }
-        /* 自定义滚动条 - 一致性设计 */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        /* 加载动画 */
-        .dot-flashing {
-            position: relative;
-            width: 10px;
-            height: 10px;
-            border-radius: 5px;
-            background-color: #3b82f6;
-            color: #3b82f6;
-            animation: dot-flashing 1s infinite linear alternate;
-            animation-delay: .5s;
-        }
-        .dot-flashing::before, .dot-flashing::after {
-            content: '';
-            display: inline-block;
-            position: absolute;
-            top: 0;
-        }
-        .dot-flashing::before {
-            left: -15px;
-            width: 10px;
-            height: 10px;
-            border-radius: 5px;
-            background-color: #3b82f6;
-            color: #3b82f6;
-            animation: dot-flashing 1s infinite linear alternate;
-            animation-delay: 0s;
-        }
-        .dot-flashing::after {
-            left: 15px;
-            width: 10px;
-            height: 10px;
-            border-radius: 5px;
-            background-color: #3b82f6;
-            color: #3b82f6;
-            animation: dot-flashing 1s infinite linear alternate;
-            animation-delay: 1s;
-        }
-        @keyframes dot-flashing {
-            0% { background-color: #3b82f6; }
-            50%, 100% { background-color: #eceff1; }
-        }
-    </style>
+    
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-800">
 
@@ -155,22 +95,33 @@
                         <p class="text-slate-500 text-sm mb-4">你可以用平常说话的方式问我任何关于课表、考试、作业或成绩的问题。</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
                             <button onclick="quickQuestion('今天有什么课？')" class="p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-600 hover:border-blue-500 hover:text-blue-600 transition flex items-center justify-between">
-                                <span>📅 今天有什么课？</span><i class="fas fa-chevron-right text-slate-300"></i>
+                                <span>今天有什么课？</span><i class="fas fa-chevron-right text-slate-300"></i>
                             </button>
                             <button onclick="quickQuestion('下周有什么作业要交？')" class="p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-600 hover:border-blue-500 hover:text-blue-600 transition flex items-center justify-between">
-                                <span>📝 下周有什么作业要交？</span><i class="fas fa-chevron-right text-slate-300"></i>
+                                <span>下周有什么作业要交？</span><i class="fas fa-chevron-right text-slate-300"></i>
                             </button>
                             <button onclick="quickQuestion('帮我查一下高等数学在哪里考？')" class="p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-600 hover:border-blue-500 hover:text-blue-600 transition flex items-center justify-between">
-                                <span>✍️ 查高等数学考试地点</span><i class="fas fa-chevron-right text-slate-300"></i>
+                                <span>查高等数学考试地点</span><i class="fas fa-chevron-right text-slate-300"></i>
                             </button>
                             <button onclick="quickQuestion('分析一下我这学期的成绩')" class="p-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-600 hover:border-blue-500 hover:text-blue-600 transition flex items-center justify-between">
-                                <span>📊 分析这学期的成绩</span><i class="fas fa-chevron-right text-slate-300"></i>
+                                <span>分析这学期的成绩</span><i class="fas fa-chevron-right text-slate-300"></i>
                             </button>
                         </div>
                     </div>
                 </div>
                 <!-- 输入控制区 -->
                 <div class="p-4 border-t border-slate-200 bg-slate-50 shrink-0">
+                    <!-- ver1.1 新增：上下文状态栏组件 -->
+                    <div id="context-status-bar" class="max-w-4xl mx-auto mb-2 px-3 py-1.5 bg-slate-100 rounded-xl flex items-center justify-between text-xs font-medium text-slate-500">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="w-2 h-2 rounded-full bg-slate-300" id="context-indicator"></span>
+                            <span id="context-summary-text">当前上下文：无</span>
+                        </div>
+                        <button type="button" onclick="triggerResetContext()" class="text-rose-500 hover:text-rose-700 flex items-center space-x-1 transition">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>重置对话</span>
+                        </button>
+                    </div>
                     <form id="chat-form" onsubmit="handleSend(event)" class="max-w-4xl mx-auto flex space-x-3">
                         <div class="relative flex-1">
                             <input type="text" id="user-input" autocomplete="off" placeholder="试试输入：'今天下午有什么课？' 或 '还有作业没做吗？'..." class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition text-sm">
@@ -238,6 +189,22 @@
                 <!-- 今日课表单列展示 -->
                 <div id="schedule-today-container" class="space-y-3 hidden">
                     <!-- 今日课表卡片流 -->
+                </div>
+            </div>
+            <!-- 在课表页面（tab-schedule）最下方追加考试倒计时面板 -->
+            <div class="border-t border-slate-200 pt-6 mt-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">📅 期末考试倒计时面板</h3>
+                        <p id="exam-overview-text" class="text-xs text-slate-400">加载中...</p>
+                    </div>
+                    <button onclick="openExamModal()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-xs font-medium hover:from-amber-600 hover:to-orange-600 transition">
+                        <i class="fas fa-plus mr-1"></i>录入新考试
+                    </button>
+                </div>
+                <!-- 考试卡片异步网格 -->
+                <div id="exam-countdown-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 动态生成倒计时卡片 -->
                 </div>
             </div>
         </section>
@@ -426,11 +393,11 @@
         <section id="tab-help" class="tab-content h-full p-6 overflow-y-auto hidden">
             <div class="max-w-3xl mx-auto space-y-6">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900">💡 帮助文档与交互说明</h2>
+                    <h2 class="text-xl font-bold text-slate-900">帮助文档与交互说明</h2>
                     <p class="text-slate-500 text-xs">了解 ClassMate AI 的交互规范、设计原则和内置自然语言解析指令</p>
                 </div>
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm text-sm leading-relaxed">
-                    <h3 class="font-bold text-slate-800 text-base border-b pb-2"><i class="fas fa-fingerprint text-blue-500 mr-2"></i>人机交互五大机制在此原型中的体现</h3>
+                    <h3 class="font-bold text-slate-800 text-base border-b pb-2"><i class="fas fa-fingerprint text-blue-500 mr-2"></i>人机交互机制</h3>
                     <ul class="space-y-2.5 text-slate-600 text-xs">
                         <li><strong class="text-slate-900">1. 反馈性 (Feedback)：</strong> 任何表单提交都有顶部 Toast 状态浮窗；AI 响应包含骨架/打字等待态；作业截止日期自动计算并呈现橙红两级色彩警示。</li>
                         <li><strong class="text-slate-900">2. 一致性 (Consistency)：</strong> 全局共用统一色彩网格（蓝、靛、灰）、圆角尺度（12px/16px）、按钮响应形态以及完全一致的顶层平滑导航栏布局。</li>
@@ -452,671 +419,50 @@
         </section>
 
     </main>
+    <!-- 2. 新增：歧义容错选择弹窗 -->
+    <div id="clarify-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 class="text-base font-bold text-slate-900 mb-3 flex items-center"><i class="fas fa-question-circle text-blue-500 mr-2"></i>您想查询哪个科目？</h3>
+            <div id="clarify-candidates" class="flex flex-col space-y-2 mb-4">
+                <!-- 动态生成科目按钮 -->
+            </div>
+            <button onclick="closeClarifyModal()" class="w-full py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">取消</button>
+        </div>
+    </div>
+
+    <!-- 3. 新增：考试数据录入弹窗 -->
+    <div id="exam-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-900 mb-4">📝 录入期末考试安排</h3>
+            <form id="exam-form" onsubmit="saveExam(event)" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">科目名称</label>
+                    <input type="text" id="exam-name" required placeholder="如：数据结构基础" class="w-full px-3 py-2 border rounded-xl focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">考试日期</label>
+                    <input type="date" id="exam-date" required class="w-full px-3 py-2 border rounded-xl focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">考试地点</label>
+                    <input type="text" id="exam-location" required placeholder="如：信工楼 102 阶梯教室" class="w-full px-3 py-2 border rounded-xl focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">所属学期</label>
+                    <select id="exam-semester" class="w-full px-3 py-2 border rounded-xl focus:outline-none focus:border-blue-500">
+                        <option value="2025-秋季学期">2025-秋季学期</option>
+                        <option value="2026-春季学期">2026-春季学期</option>
+                    </select>
+                </div>
+                <div class="flex space-x-3 justify-end pt-2">
+                    <button type="button" onclick="closeExamModal()" class="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">取消</button>
+                    <button type="submit" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition">确认保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- 核心 JavaScript 交互逻辑脚本 -->
-    <script>
-        /* ==================== 1. 初始化 Mock 核心数据集 ==================== */
-        const DEFAULT_COURSES = [
-            { id: 1, name: '高等数学(下)', teacher: '张教授', classroom: '理科楼302', weekday: 1, startTime: '08:00', endTime: '09:45' },
-            { id: 2, name: '大学英语(Ⅳ)', teacher: 'Smith', classroom: '外语楼101', weekday: 1, startTime: '10:00', endTime: '11:45' },
-            { id: 3, name: '计算机网络原理', teacher: '李副教授', classroom: '信工楼504', weekday: 2, startTime: '14:00', endTime: '15:45' },
-            { id: 4, name: '数据结构基础', teacher: '王教授', classroom: '实验楼202', weekday: 3, startTime: '08:00', endTime: '09:45' },
-            { id: 5, name: '思想道德与法治', teacher: '赵老师', classroom: '一教大礼堂', weekday: 4, startTime: '10:00', endTime: '11:45' },
-            { id: 6, name: '人工智能导论', teacher: '刘博士', classroom: '信工楼102', weekday: 5, startTime: '16:00', endTime: '17:45' }
-        ];
-
-        const DEFAULT_HOMEWORKS = [
-            { id: 1, subject: '数据结构基础', content: '完成二叉树遍历核心算法代码实现并提交至平台。', deadline: getRelativeDate(1), status: 'pending' },
-            { id: 2, subject: '计算机网络原理', content: '课后习题第三章（抓包分析明细计算题）。', deadline: getRelativeDate(3), status: 'pending' },
-            { id: 3, subject: '大学英语(Ⅳ)', content: '准备单元课文短评演讲稿草稿。', deadline: getRelativeDate(5), status: 'done' }
-        ];
-
-        const DEFAULT_PLANS = [
-            { id: 1, subject: '自主复习', content: '刷高数往年期末真题两套，订正错题集。', date: getRelativeDate(0), duration: 120, completed: false },
-            { id: 2, subject: '毕业规划', content: '完善个人简历和前端工程项目集。', date: getRelativeDate(2), duration: 90, completed: true }
-        ];
-
-        const DEFAULT_GRADES = [
-            { id: 1, subject: '高等数学(下)', score: 92, semester: '2025-秋季学期', examDate: '2025-01-10' },
-            { id: 2, subject: '大学英语(Ⅳ)', score: 88, semester: '2025-秋季学期', examDate: '2025-01-12' },
-            { id: 3, subject: '计算机网络原理', score: 85, semester: '2025-秋季学期', examDate: '2025-01-15' },
-            { id: 4, subject: '离散数学', score: 78, semester: '2025-秋季学期', examDate: '2025-01-08' },
-            { id: 5, subject: '数据结构基础', score: 95, semester: '2026-春季学期', examDate: '2026-06-20' },
-            { id: 6, subject: '人工智能导论', score: 90, semester: '2026-春季学期', examDate: '2026-06-25' }
-        ];
-
-        function getRelativeDate(daysOffset) {
-            const d = new Date();
-            d.setDate(d.getDate() + daysOffset);
-            return d.toISOString().split('T')[0];
-        }
-
-        // 初始化本地存储
-        function initLocalStorage() {
-            if (!localStorage.getItem('cm_courses')) localStorage.setItem('cm_courses', JSON.stringify(DEFAULT_COURSES));
-            if (!localStorage.getItem('cm_homeworks')) localStorage.setItem('cm_homeworks', JSON.stringify(DEFAULT_HOMEWORKS));
-            if (!localStorage.getItem('cm_plans')) localStorage.setItem('cm_plans', JSON.stringify(DEFAULT_PLANS));
-            if (!localStorage.getItem('cm_grades')) localStorage.setItem('cm_grades', JSON.stringify(DEFAULT_GRADES));
-            if (!localStorage.getItem('cm_history')) localStorage.setItem('cm_history', JSON.stringify([]));
-        }
-        initLocalStorage();
-
-        /* ==================== 2. 全局基础交互与工具函数 ==================== */
-        // Toast 反馈提示
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toast-icon');
-            const msg = document.getElementById('toast-msg');
-            
-            msg.innerText = message;
-            if(type === 'success') {
-                icon.className = "fas fa-check-circle text-emerald-400";
-            } else if (type === 'error') {
-                icon.className = "fas fa-times-circle text-rose-400";
-            } else {
-                icon.className = "fas fa-info-circle text-blue-400";
-            }
-            
-            toast.style.transform = "translateY(0)";
-            setTimeout(() => {
-                toast.style.transform = "translateY(-150%)";
-            }, 2500);
-        }
-
-        // 自定义模态框上下文变量
-        let modalConfirmCallback = null;
-        function openConfirmModal(title, desc, onConfirm) {
-            const modal = document.getElementById('confirm-modal');
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            modal.querySelector('div').classList.remove('scale-95');
-            modalConfirmCallback = onConfirm;
-        }
-
-        function closeConfirmModal() {
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 200);
-        }
-
-        document.getElementById('modal-cancel').addEventListener('click', closeConfirmModal);
-        document.getElementById('modal-confirm').addEventListener('click', () => {
-            if(modalConfirmCallback) modalConfirmCallback();
-            closeConfirmModal();
-        });
-
-        // 核心 Tab 切换（一致性导航结构控制）
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.className = "nav-btn px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition";
-            });
-            const activeBtn = document.getElementById(`nav-${tabId}`);
-            if(activeBtn) {
-                activeBtn.className = "nav-btn px-4 py-2 rounded-lg text-blue-600 bg-white shadow-sm transition";
-            }
-            
-            // 切换时触发特定模块的刷新重新渲染
-            if(tabId === 'schedule') renderScheduleModule();
-            if(tabId === 'tasks') renderTasksModule();
-            if(tabId === 'grades') renderGradesDashboard();
-            if(tabId === 'history') renderHistoryList();
-        }
-
-        /* ==================== 3. AI问答自然语言交互核心模块 ==================== */
-        function appendChatMessage(sender, content, isHtml = false) {
-            const chatBox = document.getElementById('chat-box');
-            const welcomeCard = document.getElementById('welcome-card');
-            if(welcomeCard) welcomeCard.remove();
-
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-4 animate-fade-in`;
-
-            const innerHtml = sender === 'user' ? `
-                <div class="max-w-[75%] bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-tr-none text-sm shadow-sm">
-                    ${content}
-                </div>
-            ` : `
-                <div class="flex items-start space-x-2.5 max-w-[85%]">
-                    <div class="w-8 h-8 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white rounded-xl flex items-center justify-center text-xs shadow shrink-0">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="bg-slate-100 text-slate-800 px-4 py-2.5 rounded-2xl rounded-tl-none text-sm border border-slate-200/60 shadow-sm space-y-2">
-                        ${isHtml ? content : `<div>${content}</div>`}
-                    </div>
-                </div>
-            `;
-            msgDiv.innerHTML = innerHtml;
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function appendLoadingIndicator() {
-            const chatBox = document.getElementById('chat-box');
-            const loadDiv = document.createElement('div');
-            loadDiv.id = "ai-loading";
-            loadDiv.className = "flex justify-start mb-4";
-            loadDiv.innerHTML = `
-                <div class="flex items-start space-x-2.5">
-                    <div class="w-8 h-8 bg-slate-200 text-slate-400 rounded-xl flex items-center justify-center text-xs shrink-0">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="bg-slate-100 px-6 py-4 rounded-2xl rounded-tl-none flex items-center justify-center">
-                        <div class="dot-flashing"></div>
-                    </div>
-                </div>
-            `;
-            chatBox.appendChild(loadDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function removeLoadingIndicator() {
-            const loadDiv = document.getElementById('ai-loading');
-            if(loadDiv) loadDiv.remove();
-        }
-
-        function handleSend(e) {
-            if(e) e.preventDefault();
-            const inputEl = document.getElementById('user-input');
-            const question = inputEl.value.trim();
-            if(!question) return;
-
-            appendChatMessage('user', question);
-            inputEl.value = '';
-            
-            appendLoadingIndicator();
-
-            // 仿真延迟响应机制 (非功能需求优化: 避免用户焦虑的合理延迟感)
-            setTimeout(() => {
-                removeLoadingIndicator();
-                const matchedAnswer = matchNlpLogic(question);
-                appendChatMessage('ai', matchedAnswer, true);
-                
-                // 本地存储历史问答数据
-                const history = JSON.parse(localStorage.getItem('cm_history'));
-                history.unshift({
-                    id: Date.now(),
-                    question: question,
-                    answer: matchedAnswer,
-                    timestamp: new Date().toLocaleString()
-                });
-                localStorage.setItem('cm_history', JSON.stringify(history));
-                refreshChatSideSummary();
-            }, 600);
-        }
-
-        function quickQuestion(text) {
-            document.getElementById('user-input').value = text;
-            handleSend();
-        }
-
-        // 自然语言关键词匹配解析核心逻辑 (容错性机制：提供兜底引导方案)
-        function matchNlpLogic(query) {
-            const q = query.toLowerCase();
-            const homeworks = JSON.parse(localStorage.getItem('cm_homeworks'));
-            const courses = JSON.parse(localStorage.getItem('cm_courses'));
-
-            if(q.includes('课') || q.includes('教室') || q.includes('上什么')) {
-                const todayWeekDay = new Date().getDay() || 7; // 1-7
-                const todayCourses = courses.filter(c => c.weekday === todayWeekDay);
-                if(todayCourses.length === 0) {
-                    return `🎉 检查到你<b>今天没有固定的教学安排课程</b>哦！你可以利用富余时间在“计划与作业”模块中安排自习。`;
-                }
-                let html = `✨ 帮你在后台查到了<b>今天（周${'十一二三四五六日'[todayWeekDay]}）</b>的课程信息：<br><ul class="list-disc pl-4 space-y-1 mt-1">`;
-                todayCourses.forEach(c => {
-                    html += `<li><b>${c.startTime}-${c.endTime}</b> | ${c.name} (${c.classroom} · ${c.teacher})</li>`;
-                });
-                html += `</ul><span class="text-xs text-blue-500 block mt-2">💡 提示：如需查看完整全周课表，请点击上方“课程表”选项卡。</span>`;
-                return html;
-            }
-
-            if(q.includes('作业') || q.includes('截止') || q.includes('要交')) {
-                const pendingList = homeworks.filter(h => h.status === 'pending');
-                if(pendingList.length === 0) {
-                    return `🟢 恭喜你！当前<b>所有录入的作业均已全部搞定</b>，暂无待完成项，继续保持！`;
-                }
-                let html = `🚨 盘点完毕，你目前还有 <b>${pendingList.length}</b> 项作业尚未完成，请注意截止时间：<br><ul class="list-disc pl-4 space-y-1 mt-1">`;
-                pendingList.forEach(h => {
-                    html += `<li><span class="text-amber-600 font-medium">[${h.subject}]</span> ${h.content} <span class="text-slate-400 font-mono text-xs">(${h.deadline})</span></li>`;
-                });
-                html += `</ul>`;
-                return html;
-            }
-
-            if(q.includes('考试') || q.includes('高数')) {
-                return `✍️ <b>期末统一考试日程提醒：</b><br>📚 <b>高等数学(下)</b><br>⏱️ 时间：2026年07月10日 09:00 - 11:00<br>📍 地点：第十五教学楼 301 阶梯教室<br>⚠️ 备注：请携带学生证和2B铅笔。`;
-            }
-
-            if(q.includes('成绩') || q.includes('绩点')) {
-                return `📊 <b>当前选定学期学业成绩速报：</b><br>你当前已出分科目平均成绩为 <b>92.5</b>，换算绩点约为 <b>4.25 / 5.0</b>。在“数据可视化”大屏中有完整的雷达对比图。`;
-            }
-
-            // 兜底引导话术（容错性原则体现）
-            return `🤔 抱歉同学，我未能完全理解：“<i>${query}</i>” 的查询意图。<br>💡 <b>你可以尝试以下指令关键词提问：</b><br>• “今天上什么课？” / “查课表”<br>• “有什么作业没写？”<br>• “高数考试在哪个教室？”<br>• “分析一下我的成绩情况”`;
-        }
-
-        // 侧边栏小部件汇总渲染
-        function refreshChatSideSummary() {
-            const courses = JSON.parse(localStorage.getItem('cm_courses'));
-            const homeworks = JSON.parse(localStorage.getItem('cm_homeworks'));
-            const todayWeekDay = new Date().getDay() || 7;
-
-            // 今日课程
-            const todayCourses = courses.filter(c => c.weekday === todayWeekDay);
-            const courseListEl = document.getElementById('today-summary-list');
-            if(todayCourses.length === 0) {
-                courseListEl.innerHTML = `<div class="text-slate-400 text-xs p-3 bg-white border rounded-xl text-center">今日无课，一身轻松</div>`;
-            } else {
-                courseListEl.innerHTML = todayCourses.map(c => `
-                    <div class="bg-white p-2.5 border border-slate-200 rounded-xl text-xs flex justify-between items-center shadow-sm">
-                        <div>
-                            <div class="font-bold text-slate-800">${c.name}</div>
-                            <div class="text-slate-400 mt-0.5"><i class="fas fa-map-marker-alt mr-1"></i>${c.classroom}</div>
-                        </div>
-                        <span class="font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">${c.startTime}</span>
-                    </div>
-                `).join('');
-            }
-
-            // 紧急作业
-            const pendingHws = homeworks.filter(h => h.status === 'pending');
-            const urgentListEl = document.getElementById('urgent-summary-list');
-            if(pendingHws.length === 0) {
-                urgentListEl.innerHTML = `<div class="text-slate-400 text-xs p-3 bg-white border rounded-xl text-center">暂无截止作业</div>`;
-            } else {
-                urgentListEl.innerHTML = pendingHws.slice(0,2).map(h => `
-                    <div class="bg-white p-2.5 border border-slate-200 rounded-xl text-xs border-l-4 border-l-amber-500 shadow-sm">
-                        <div class="font-bold text-slate-800 truncate">${h.content}</div>
-                        <div class="text-slate-400 mt-1 flex justify-between items-center">
-                            <span>${h.subject}</span>
-                            <span class="text-rose-500 font-bold font-mono">${h.deadline}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-        refreshChatSideSummary();
-
-        /* ==================== 4. 课程表查阅模块 ==================== */
-        let currentScheduleView = 'week';
-        function toggleScheduleView(view) {
-            currentScheduleView = view;
-            document.getElementById('sched-view-week').className = view === 'week' ? "px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-800" : "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800";
-            document.getElementById('sched-view-today').className = view === 'today' ? "px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-800" : "px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-800";
-            renderScheduleModule();
-        }
-
-        function renderScheduleModule() {
-            const courses = JSON.parse(localStorage.getItem('cm_courses'));
-            const weekContainer = document.getElementById('schedule-week-container');
-            const todayContainer = document.getElementById('schedule-today-container');
-
-            if(currentScheduleView === 'week') {
-                weekContainer.classList.remove('hidden');
-                todayContainer.classList.add('hidden');
-                
-                const timeSlots = [
-                    { name: '第一大节<br>(08:00 - 09:45)', slotId: 1 },
-                    { name: '第二大节<br>(10:00 - 11:45)', slotId: 2 },
-                    { name: '第三大节<br>(14:00 - 15:45)', slotId: 3 },
-                    { name: '第四大节<br>(16:00 - 17:45)', slotId: 4 }
-                ];
-
-                let tbodyHtml = '';
-                timeSlots.forEach(slot => {
-                    tbodyHtml += `<tr class="divide-x divide-slate-100">`;
-                    tbodyHtml += `<td class="p-3 text-center bg-slate-50 font-medium text-slate-500 border-r">${slot.name}</td>`;
-                    
-                    for(let day = 1; day <= 5; day++) {
-                        // 根据节次时间做模糊映射匹配
-                        let matched = courses.find(c => c.weekday === day && isCourseInSlot(c, slot.slotId));
-                        if(matched) {
-                            tbodyHtml += `
-                                <td class="p-3">
-                                    <div class="bg-blue-50 border border-blue-100 p-2.5 rounded-xl space-y-1">
-                                        <div class="font-bold text-blue-700 leading-tight">${matched.name}</div>
-                                        <div class="text-slate-500 scale-95 origin-left"><i class="fas fa-user text-blue-300 mr-1"></i>${matched.teacher}</div>
-                                        <div class="text-slate-500 scale-95 origin-left"><i class="fas fa-map-marker-alt text-blue-300 mr-1"></i><b>${matched.classroom}</b></div>
-                                    </div>
-                                </td>
-                            `;
-                        } else {
-                            tbodyHtml += `<td class="p-3 text-slate-300 text-center font-light">-</td>`;
-                        }
-                    }
-                    tbodyHtml += `</tr>`;
-                });
-                document.getElementById('schedule-table-body').innerHTML = tbodyHtml;
-            } else {
-                weekContainer.classList.add('hidden');
-                todayContainer.classList.remove('hidden');
-                const todayWeekDay = new Date().getDay() || 7;
-                const todayCourses = courses.filter(c => c.weekday === todayWeekDay);
-                
-                if(todayCourses.length === 0) {
-                    todayContainer.innerHTML = `<div class="bg-white p-8 border border-dashed text-center rounded-2xl text-slate-400">🎉 今天没有任何安排的课程，好好休息吧！</div>`;
-                } else {
-                    todayContainer.innerHTML = todayCourses.map(c => `
-                        <div class="bg-white p-4 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold"><i class="fas fa-bookmark"></i></div>
-                                <div>
-                                    <h4 class="font-bold text-slate-900">${c.name}</h4>
-                                    <p class="text-xs text-slate-400 mt-0.5">任课教师：${c.teacher} | 授课地点：<span class="text-slate-700 font-medium">${c.classroom}</span></p>
-                                </div>
-                            </div>
-                            <span class="text-sm font-mono font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-xl self-start sm:self-auto">${c.startTime} - ${c.endTime}</span>
-                        </div>
-                    `).join('');
-                }
-            }
-        }
-
-        function isCourseInSlot(course, slotId) {
-            const startHour = parseInt(course.startTime.split(':')[0]);
-            if(slotId === 1 && startHour < 10) return true;
-            if(slotId === 2 && startHour >= 10 && startHour < 13) return true;
-            if(slotId === 3 && startHour >= 13 && startHour < 16) return true;
-            if(slotId === 4 && startHour >= 16) return true;
-            return false;
-        }
-
-        /* ==================== 5. 计划与作业管理（含双重红色/橙色高亮警示拦截） ==================== */
-        function renderTasksModule() {
-            const homeworks = JSON.parse(localStorage.getItem('cm_homeworks'));
-            const plans = JSON.parse(localStorage.getItem('cm_plans'));
-
-            // 渲染作业列表
-            const hwListEl = document.getElementById('homework-list');
-            hwListEl.innerHTML = homeworks.map(h => {
-                const diffDays = Math.ceil((new Date(h.deadline) - new Date()) / (1000 * 60 * 60 * 24));
-                let warnClass = "border-slate-200 bg-white";
-                let badgeHtml = "";
-
-                if(h.status === 'pending') {
-                    if(diffDays <= 0) {
-                        warnClass = "border-rose-200 bg-rose-50/60";
-                        badgeHtml = `<span class="bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-md font-bold animate-pulse">今日截止/超期</span>`;
-                    } else if (diffDays <= 3) {
-                        warnClass = "border-amber-200 bg-amber-50/40";
-                        badgeHtml = `<span class="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-md font-bold">3天内紧迫</span>`;
-                    }
-                } else {
-                    warnClass = "border-slate-200 bg-slate-50 opacity-60";
-                }
-
-                return `
-                    <div class="p-4 border rounded-2xl flex items-start justify-between gap-4 transition shadow-sm ${warnClass}">
-                        <div class="flex items-start space-x-3">
-                            <input type="checkbox" ${h.status === 'done'?'checked':''} onclick="toggleHwStatus(${h.id})" class="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-                            <div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-bold text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-md">${h.subject}</span>
-                                    ${badgeHtml}
-                                </div>
-                                <p class="text-sm text-slate-700 mt-1.5 ${h.status==='done'?'line-through text-slate-400':''}">${h.content}</p>
-                                <div class="text-xs text-slate-400 mt-1 font-mono"><i class="fas fa-clock mr-1"></i>截止时限: ${h.deadline}</div>
-                            </div>
-                        </div>
-                        <button onclick="triggerDeleteTask('homework', ${h.id})" class="text-slate-300 hover:text-rose-500 text-xs transition p-1"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                `;
-            }).join('');
-
-            // 渲染学习计划列表
-            const planListEl = document.getElementById('plan-list');
-            planListEl.innerHTML = plans.map(p => `
-                <div class="p-4 bg-white border border-slate-200 rounded-2xl flex items-start justify-between shadow-sm ${p.completed?'opacity-60 bg-slate-50':''}">
-                    <div class="flex items-start space-x-3">
-                        <button onclick="togglePlanStatus(${p.id})" class="mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center text-xs transition ${p.completed?'bg-emerald-500 border-emerald-500 text-white':'border-slate-300 hover:border-blue-500 text-transparent'}">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <span class="font-bold text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md">${p.subject}</span>
-                                <span class="text-xs font-mono text-slate-400">⏱️ ${p.duration}分钟</span>
-                            </div>
-                            <p class="text-sm text-slate-700 mt-1.5 ${p.completed?'line-through text-slate-400':''}">${p.content}</p>
-                            <div class="text-xs text-slate-400 mt-1 font-mono"><i class="fas fa-calendar mr-1"></i>计划执行日: ${p.date}</div>
-                        </div>
-                    </div>
-                    <button onclick="triggerDeleteTask('plan', ${p.id})" class="text-slate-300 hover:text-rose-500 text-xs transition p-1"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            `).join('');
-        }
-
-        function toggleHwStatus(id) {
-            const hws = JSON.parse(localStorage.getItem('cm_homeworks'));
-            const target = hws.find(h => h.id === id);
-            if(target) {
-                target.status = target.status === 'done' ? 'pending' : 'done';
-                localStorage.setItem('cm_homeworks', JSON.stringify(hws));
-                showToast(target.status === 'done' ? "作业已标记为完成状态 🎉" : "作业已还原重置");
-                renderTasksModule();
-                triggerNativeNotification(target);
-            }
-        }
-
-        function togglePlanStatus(id) {
-            const plans = JSON.parse(localStorage.getItem('cm_plans'));
-            const target = plans.find(p => p.id === id);
-            if(target) {
-                target.completed = !target.completed;
-                localStorage.setItem('cm_plans', JSON.stringify(plans));
-                showToast(target.completed ? "计划任务已达成！" : "任务已重置");
-                renderTasksModule();
-            }
-        }
-
-        // 录入弹窗处理
-        function openAddTaskModal(type) {
-            document.getElementById('form-type').value = type;
-            document.getElementById('task-form').reset();
-            document.getElementById('form-error-tip').classList.add('hidden');
-            
-            if(type === 'homework') {
-                document.getElementById('task-modal-title').innerText = "🚀 新增课程作业提醒";
-                document.getElementById('form-date-label').innerText = "截止日期";
-                document.getElementById('form-duration-container').classList.add('hidden');
-                document.getElementById('form-date').value = getRelativeDate(2);
-            } else {
-                document.getElementById('task-modal-title').innerText = "💡 制定自主学习计划";
-                document.getElementById('form-date-label').innerText = "执行日期";
-                document.getElementById('form-duration-container').classList.remove('hidden');
-                document.getElementById('form-date').value = getRelativeDate(0);
-            }
-            document.getElementById('task-modal').classList.remove('hidden');
-        }
-
-        function closeTaskModal() {
-            document.getElementById('task-modal').classList.add('hidden');
-        }
-
-        function saveTask(e) {
-            e.preventDefault();
-            const type = document.getElementById('form-type').value;
-            const subject = document.getElementById('form-subject').value.trim();
-            const content = document.getElementById('form-content').value.trim();
-            const date = document.getElementById('form-date').value;
-            const duration = parseInt(document.getElementById('form-duration').value) || 60;
-
-            // 容错拦截校验机制
-            if(!subject || !content || !date) {
-                document.getElementById('form-error-tip').classList.remove('hidden');
-                return;
-            }
-
-            if(type === 'homework') {
-                const hws = JSON.parse(localStorage.getItem('cm_homeworks'));
-                hws.unshift({ id: Date.now(), subject, content, deadline: date, status: 'pending' });
-                localStorage.setItem('cm_homeworks', JSON.stringify(hws));
-            } else {
-                const plans = JSON.parse(localStorage.getItem('cm_plans'));
-                plans.unshift({ id: Date.now(), subject, content, date, duration, completed: false });
-                localStorage.setItem('cm_plans', JSON.stringify(plans));
-            }
-
-            showToast("内容已录入本地缓存成功");
-            closeTaskModal();
-            renderTasksModule();
-        }
-
-        // 删除二次确认拦截（体现可控性与容错性）
-        function triggerDeleteTask(type, id) {
-            openConfirmModal(
-                "确认删除该项记录吗？",
-                "数据仅存储于浏览器本地，删除后将永久丢失，不可恢复。",
-                () => {
-                    if(type === 'homework') {
-                        const hws = JSON.parse(localStorage.getItem('cm_homeworks'));
-                        localStorage.setItem('cm_homeworks', JSON.stringify(hws.filter(h => h.id !== id)));
-                    } else {
-                        const plans = JSON.parse(localStorage.getItem('cm_plans'));
-                        localStorage.setItem('cm_plans', JSON.stringify(plans.filter(p => p.id !== id)));
-                    }
-                    showToast("数据已安全移除", "info");
-                    renderTasksModule();
-                }
-            );
-        }
-
-        // 浏览器原生级通知推送机制
-        function triggerNativeNotification(hwObj) {
-            if(!document.getElementById('notify-toggle').checked) return;
-            if (Notification.permission === "granted") {
-                new Notification(`ClassMate AI 提示`, {
-                    body: `作业状态更新通知：[${hwObj.subject}] ${hwObj.status === 'done' ? '已标记完成！' : '重置为未完成状态'}`
-                });
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission();
-            }
-        }
-        // 初始拉取授权
-        if (typeof Notification !== 'undefined' && Notification.permission === "default") {
-            Notification.requestPermission();
-        }
-
-        /* ==================== 6. 成绩数据可视化大屏（原生手绘 CSS 直观渲染） ==================== */
-        function renderGradesDashboard() {
-            const grades = JSON.parse(localStorage.getItem('cm_grades'));
-            const plans = JSON.parse(localStorage.getItem('cm_plans'));
-            const selectSemester = document.getElementById('semester-select').value;
-
-            // 过滤对应学期成绩
-            const semGrades = grades.filter(g => g.semester === selectSemester);
-
-            // 1. 统计 KPI 计算
-            let avgScore = 0;
-            let gpa = 0;
-            if(semGrades.length > 0) {
-                const totalScore = semGrades.reduce((sum, curr) => sum + curr.score, 0);
-                avgScore = (totalScore / semGrades.length).toFixed(1);
-                // 转换基础标准绩点算法公式：(分数-50)/10
-                const totalGpa = semGrades.reduce((sum, curr) => sum + Math.max(0, (curr.score - 50) / 10), 0);
-                gpa = (totalGpa / semGrades.length).toFixed(2);
-            }
-            document.getElementById('kpi-avg-score').innerText = semGrades.length > 0 ? `${avgScore} 分` : '--';
-            document.getElementById('kpi-gpa').innerText = semGrades.length > 0 ? `${gpa} / 5.0` : '--';
-
-            const planCompletionRate = plans.length > 0 ? Math.round((plans.filter(p => p.completed).length / plans.length) * 100) : 0;
-            document.getElementById('kpi-completion').innerText = `${planCompletionRate}%`;
-
-            // 2. 渲染手绘柱状对比图表
-            const barContainer = document.getElementById('bar-chart-container');
-            if(semGrades.length === 0) {
-                barContainer.innerHTML = `<div class="text-slate-400 text-xs w-full text-center pb-12">该学期无考试分录数据</div>`;
-            } else {
-                barContainer.innerHTML = semGrades.map(g => {
-                    const heightPercent = g.score; // 满分100对应100%高度相对位置
-                    return `
-                        <div class="flex flex-col items-center flex-1 group relative cursor-pointer px-1">
-                            <!-- 悬浮提示框 (反馈性原则) -->
-                            <div class="absolute bottom-full mb-2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition duration-150 pointer-events-none z-10 whitespace-nowrap">
-                                分数: ${g.score} | 绩点: ${Math.max(0, (g.score - 50) / 10).toFixed(1)}
-                            </div>
-                            <!-- 动态高度柱条 -->
-                            <div class="w-8 sm:w-10 bg-gradient-to-t from-blue-500 to-indigo-400 group-hover:from-blue-600 group-hover:to-indigo-500 rounded-t-md transition-all duration-500 ease-out shadow-sm" style="height: ${heightPercent}%"></div>
-                            <!-- 轴文本标签 -->
-                            <span class="text-[10px] text-slate-500 font-medium mt-2 text-center truncate w-full" title="${g.subject}">${g.subject}</span>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            // 3. 动态更新饼图角度样式
-            const pieCircle = document.getElementById('pie-chart-circle');
-            const pieText = document.getElementById('pie-center-text');
-            pieText.innerText = `${planCompletionRate}%`;
-            pieCircle.style.background = `conic-gradient(#3b82f6 0% ${planCompletionRate}%, #f1f5f9 ${planCompletionRate}% 100%)`;
-        }
-
-        /* ==================== 7. 历史问答归档检索模块 ==================== */
-        function renderHistoryList() {
-            const history = JSON.parse(localStorage.getItem('cm_history'));
-            const searchKey = document.getElementById('history-search').value.toLowerCase().trim();
-            const flowEl = document.getElementById('history-items-flow');
-
-            const filtered = history.filter(item => 
-                item.question.toLowerCase().includes(searchKey) || 
-                item.answer.toLowerCase().includes(searchKey)
-            );
-
-            if(filtered.length === 0) {
-                flowEl.innerHTML = `<div class="bg-white p-8 border border-dashed rounded-2xl text-center text-slate-400 text-xs">没有匹配到相关的历史问答记录档案</div>`;
-                return;
-            }
-
-            flowEl.innerHTML = filtered.map(item => `
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm text-xs">
-                    <div class="flex justify-between items-center text-slate-400 border-b border-slate-50 pb-2">
-                        <span class="font-mono"><i class="fas fa-calendar-alt mr-1"></i>${item.timestamp}</span>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="reuseQuestion(\`${item.question.replace(/"/g, '&quot;')}\`)" class="text-blue-500 hover:underline"><i class="fas fa-copy mr-1"></i>复用问题</button>
-                            <button onclick="deleteHistoryItem(${item.id})" class="text-slate-300 hover:text-rose-500 transition"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="font-bold text-slate-900 mb-1">🤔 问题: ${item.question}</div>
-                        <div class="text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-relaxed">🤖 回答: ${item.answer}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function reuseQuestion(qText) {
-            switchTab('ai-chat');
-            document.getElementById('user-input').value = qText;
-            document.getElementById('user-input').focus();
-            showToast("问题已自动填入输入框，回车即可重新发送", "info");
-        }
-
-        function deleteHistoryItem(id) {
-            const history = JSON.parse(localStorage.getItem('cm_history'));
-            const remains = history.filter(h => h.id !== id);
-            localStorage.setItem('cm_history', JSON.stringify(remains));
-            showToast("单条记录已抹除", "info");
-            renderHistoryList();
-        }
-
-        function triggerClearAllHistory() {
-            openConfirmModal(
-                "确定清空全部对话存档吗？",
-                "此操作会将本地缓存的所有问答记录彻底清除，清空后无法找回。",
-                () => {
-                    localStorage.setItem('cm_history', JSON.stringify([]));
-                    showToast("历史存储已全部被清空", "info");
-                    renderHistoryList();
-                }
-            );
-        }
-
-        // 默认进入 AI 助手 Tab 页面
-        switchTab('ai-chat');
-    </script>
+    <script src="js/scp.js"></script>
 </body>
 </html>
