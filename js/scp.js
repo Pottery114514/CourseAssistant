@@ -296,6 +296,57 @@ function renderExamCountdownModule() {
     }
 }
 
+// 关闭今日考试提醒弹窗
+function closeTodayExamModal() {
+    const modal = document.getElementById('today-exam-alert-modal');
+    if (!modal) return;
+    modal.classList.add('opacity-0');
+    setTimeout(() => modal.classList.add('hidden'), 200);
+}
+
+// 核心逻辑：检查并触发当日考试主页弹窗
+function checkAndAlertTodayExams() {
+    // 1. 限制单次会话只弹窗一次，避免切换Tab频繁打扰
+    if (sessionStorage.getItem('cm_today_alerted') === 'true') return;
+    
+    const exams = JSON.parse(localStorage.getItem('cm_exams') || '[]');
+    if (exams.length === 0) return;
+
+    // 2. 获取当前本地日期 (YYYY-MM-DD 格式)
+    const todayStr = new Date().toISOString().split('T')[0];
+    
+    // 3. 筛选出日期为今天的考试
+    const todayExams = exams.filter(exam => exam.date === todayStr);
+    
+    if (todayExams.length > 0) {
+        const listEl = document.getElementById('today-exam-list');
+        const modal = document.getElementById('today-exam-alert-modal');
+        
+        if (!listEl || !modal) return;
+
+        // 4. 动态渲染今日考试详情卡片
+        listEl.innerHTML = todayExams.map(exam => `
+            <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <div class="font-bold text-slate-800 text-sm flex justify-between">
+                    <span>📚 ${exam.name}</span>
+                    <span class="text-[10px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">${exam.semester}</span>
+                </div>
+                <div class="text-xs text-slate-600 mt-1 flex items-center">
+                    <i class="fas fa-map-marker-alt text-amber-500 mr-1.5 w-3 text-center"></i>
+                    <span>考场地点：<b>${exam.location}</b></span>
+                </div>
+            </div>
+        `).join('');
+
+        // 5. 执行淡入显示
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        
+        // 6. 标记本次会话已提醒
+        sessionStorage.setItem('cm_today_alerted', 'true');
+    }
+}
+
 // 挂载至初始化勾子中
 const originalRenderScheduleModule = renderScheduleModule;
 renderScheduleModule = function() {
@@ -306,6 +357,8 @@ renderScheduleModule = function() {
 // 页面初次加载时执行一次状态刷新
 document.addEventListener('DOMContentLoaded', () => {
     qaEngine.updateStatusUI();
+    //新增：进入页面主页时，立刻检查是否有当天的考试需要弹窗提醒
+    checkAndAlertTodayExams();
     setInterval(renderExamCountdownModule, 60000); // 后台每分钟增量刷新倒计时计算
 });
 

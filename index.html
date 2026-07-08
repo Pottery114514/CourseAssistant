@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能课程助手 - 人机交互原型演示</title>
+    <title>智能课程助手 - 人机交互原型</title>
     <!-- 自定义加载动画,滚动条等 -->
     <link rel="stylesheet" href="css/styles.css">
     <!-- 引入 Tailwind CSS 用于快速构建一致性 UI -->
@@ -195,7 +195,7 @@
             <div class="border-t border-slate-200 pt-6 mt-8">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">📅 期末考试倒计时面板</h3>
+                        <h3 class="text-lg font-bold text-slate-900">期末考试</h3>
                         <p id="exam-overview-text" class="text-xs text-slate-400">加载中...</p>
                     </div>
                     <button onclick="openExamModal()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-xs font-medium hover:from-amber-600 hover:to-orange-600 transition">
@@ -459,6 +459,26 @@
                     <button type="submit" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition">确认保存</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- 4. 新增：当天考试主页弹窗提醒 -->
+    <div id="today-exam-alert-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-gradient-to-b from-amber-50 to-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-amber-200 text-center animate-fade-in">
+            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl animate-bounce">
+                <i class="fas fa-bell"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">今日考试提醒！</h3>
+            <p class="text-xs text-amber-600 font-medium mb-4">今天有需要参加的期末考试，请务必注意时间！</p>
+            
+            <!-- 今日考试科目列表容器 -->
+            <div id="today-exam-list" class="space-y-2.5 max-h-48 overflow-y-auto mb-5 text-left">
+                <!-- 动态渲染当日考试具体信息 -->
+            </div>
+            
+            <button onclick="closeTodayExamModal()" class="w-full py-2.5 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-md shadow-amber-500/20 transition">
+                我知道了，准时参加
+            </button>
         </div>
     </div>
 
