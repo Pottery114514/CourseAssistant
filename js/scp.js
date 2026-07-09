@@ -306,8 +306,8 @@ function closeTodayExamModal() {
 
 // 核心逻辑：检查并触发当日考试主页弹窗
 function checkAndAlertTodayExams() {
-    // 1. 限制单次会话只弹窗一次，避免切换Tab频繁打扰
-    if (sessionStorage.getItem('cm_today_alerted') === 'true') return;
+    // 1. 限制单次会话只弹窗一次，避免切换Tab频繁打扰(可选)
+    //if (sessionStorage.getItem('cm_today_alerted') === 'true') return;
     
     const exams = JSON.parse(localStorage.getItem('cm_exams') || '[]');
     if (exams.length === 0) return;
@@ -371,7 +371,7 @@ const DEFAULT_COURSES = [
     { id: 3, name: '计算机网络原理', teacher: '李副教授', classroom: '信工楼504', weekday: 2, startTime: '14:00', endTime: '15:45' },
     { id: 4, name: '数据结构基础', teacher: '王教授', classroom: '实验楼202', weekday: 3, startTime: '08:00', endTime: '09:45' },
     { id: 5, name: '思想道德与法治', teacher: '赵老师', classroom: '一教大礼堂', weekday: 4, startTime: '10:00', endTime: '11:45' },
-    { id: 6, name: '人工智能导论', teacher: '刘博士', classroom: '信工楼102', weekday: 5, startTime: '16:00', endTime: '17:45' }
+    { id: 6, name: 'javaweb设计', teacher: '刘博士', classroom: '信工楼102', weekday: 5, startTime: '16:00', endTime: '17:45' }
 ];
 
 const DEFAULT_HOMEWORKS = [
@@ -388,9 +388,9 @@ const DEFAULT_PLANS = [
 const DEFAULT_GRADES = [
     { id: 1, subject: '高等数学(下)', score: 92, semester: '2025-秋季学期', examDate: '2025-01-10' },
     { id: 2, subject: '大学英语(Ⅳ)', score: 88, semester: '2025-秋季学期', examDate: '2025-01-12' },
-    { id: 3, subject: '计算机网络原理', score: 85, semester: '2025-秋季学期', examDate: '2025-01-15' },
+    { id: 3, subject: 'java面向对象程序设计', score: 85, semester: '2025-秋季学期', examDate: '2025-01-15' },
     { id: 4, subject: '离散数学', score: 78, semester: '2025-秋季学期', examDate: '2025-01-08' },
-    { id: 5, subject: '数据结构基础', score: 95, semester: '2026-春季学期', examDate: '2026-06-20' },
+    { id: 5, subject: '数据结构', score: 95, semester: '2026-春季学期', examDate: '2026-06-20' },
     { id: 6, subject: '人工智能导论', score: 90, semester: '2026-春季学期', examDate: '2026-06-25' }
 ];
 
@@ -935,26 +935,45 @@ function renderGradesDashboard() {
     const planCompletionRate = plans.length > 0 ? Math.round((plans.filter(p => p.completed).length / plans.length) * 100) : 0;
     document.getElementById('kpi-completion').innerText = `${planCompletionRate}%`;
 
-    // 2. 渲染手绘柱状对比图表
+
+    //2. 渲染手绘柱状对比图表
     const barContainer = document.getElementById('bar-chart-container');
-    if(semGrades.length === 0) {
-        barContainer.innerHTML = `<div class="text-slate-400 text-xs w-full text-center pb-12">该学期无考试分录数据</div>`;
+    if (!barContainer) return;
+
+    if (semGrades.length === 0) {
+        barContainer.innerHTML = `<div class="text-slate-400 text-xs w-full text-center py-12">📭 该学期无考试分录数据</div>`;
     } else {
-        barContainer.innerHTML = semGrades.map(g => {
-            const heightPercent = g.score; // 满分100对应100%高度相对位置
-            return `
-                <div class="flex flex-col items-center flex-1 group relative cursor-pointer px-1">
-                    <!-- 悬浮提示框 (反馈性原则) -->
-                    <div class="absolute bottom-full mb-2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition duration-150 pointer-events-none z-10 whitespace-nowrap">
-                        分数: ${g.score} | 绩点: ${Math.max(0, (g.score - 50) / 10).toFixed(1)}
-                    </div>
-                    <!-- 动态高度柱条 -->
-                    <div class="w-8 sm:w-10 bg-gradient-to-t from-blue-500 to-indigo-400 group-hover:from-blue-600 group-hover:to-indigo-500 rounded-t-md transition-all duration-500 ease-out shadow-sm" style="height: ${heightPercent}%"></div>
-                    <!-- 轴文本标签 -->
-                    <span class="text-[10px] text-slate-500 font-medium mt-2 text-center truncate w-full" title="${g.subject}">${g.subject}</span>
-                </div>
-            `;
-        }).join('');
+        const maxScore = Math.max(...semGrades.map(g => g.score));
+        const hasFullScore = maxScore >= 100;
+        
+        barContainer.innerHTML = `
+            <div class="w-full h-full flex items-end justify-around px-1">
+                ${semGrades.map(g => {
+                    // 归一化高度：最高分占85%
+                    let heightPercent = hasFullScore ? (g.score / 100) * 85 : (g.score / maxScore) * 85;
+                    heightPercent = Math.max(heightPercent, 5); // 最低5%
+                    
+                    const gpa = Math.max(0, (g.score - 50) / 10).toFixed(1);
+                    
+                    return `
+                        <div class="flex flex-col items-center flex-1 group relative cursor-pointer px-1 h-full justify-end pb-6">
+                            <!-- 悬浮提示框 -->
+                            <div class="absolute bottom-full mb-2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition duration-150 pointer-events-none z-10 whitespace-nowrap">
+                                分数: ${g.score} | 绩点: ${gpa}
+                            </div>
+                            <!-- 动态高度柱条 -->
+                            <div class="w-8 sm:w-10 bg-gradient-to-t from-blue-500 to-indigo-400 group-hover:from-blue-600 group-hover:to-indigo-500 rounded-t-md transition-all duration-500 ease-out shadow-sm" 
+                                style="height: ${heightPercent}%; min-height: 4px;">
+                            </div>
+                            <!-- 轴文本标签 -->
+                            <span class="text-[10px] text-slate-500 font-medium mt-2 text-center truncate w-full" title="${g.subject}">
+                                ${g.subject}
+                            </span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
     }
 
     // 3. 动态更新饼图角度样式
